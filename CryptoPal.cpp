@@ -7,10 +7,9 @@
 namespace Crypto{
 
 	// Declaration of the Base64 and alphabet
-  const std::string B64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  const std::string HexPad = "0123456789ABCDEF";
+  const std::string B64pad = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	// Convert string into binary boolean vector
+  // Convert string into binary boolean vector
   std::vector<bool> Str2Bin(std::string s){
     std::vector<bool> Bin (s.length() * 8, 0);
     std::vector<bool>::reverse_iterator v = Bin.rbegin();
@@ -37,40 +36,47 @@ namespace Crypto{
 
   // String to Base64
   std::string Str2B64(std::string s){
+    std::stringstream B64Stream;
+    std::string B64;
+    std::string padding;
 
-	std::string B64;
-	std::bitset<6> b;
-  std::vector<bool> Bin = Str2Bin(s);
-
-	// Compose padding string and append 0 bits to the Bin vector
-	unsigned short k = 3 - s.length() % 3;
-	std::string padding	(k, '=');
-	for (int i = 0; i < 2 * k; i++) Bin.push_back(0);
-
-	//read six bits at a time and encode them
-	for (int j = 0; j < Bin.size() / 6; j++){
-		b.set(5, Bin[j * 6]);
-		b.set(4, Bin[j * 6 + 1]);
-		b.set(3, Bin[j * 6 + 2]);
-		b.set(2, Bin[j * 6 + 3]);
-		b.set(1, Bin[j * 6 + 4]);
-		b.set(0, Bin[j * 6 + 5]);
-		unsigned long l = b.to_ulong();
-		B64 += B64Alphabet[l];
-	}
-	B64 += padding;
-	return B64;
+    for (std::string::const_iterator it = s.cbegin(); it < s.cend(); ++it){
+      switch (s.cend() - it){
+        case 1:
+          B64Stream << B64pad.at((*it & 0xFC) >> 2);
+          B64Stream << B64pad.at((*it++ & 0x03) << 4);
+          break;
+        case 2:
+          B64Stream << B64pad.at((*it & 0xFC) >> 2);
+          B64Stream << B64pad.at((*it++ & 0x03) << 4 | (*it & 0xF0) >> 4);
+          B64Stream << B64pad.at((*it++ & 0x0F) << 2);
+          break;
+        default:
+          B64Stream << B64pad.at((*it & 0xFC) >> 2);
+          B64Stream << B64pad.at((*it++ & 0x03) << 4 | (*it & 0xF0) >> 4);
+          B64Stream << B64pad.at((*it++ & 0x0F) << 2 | (*it & 0xC0) >> 6);
+          B64Stream << B64pad.at((*it & 0x3F));
+      }
+    }
+    if (s.length() % 3 != 0){
+      padding.assign(3 - s.length() % 3, '=');
+      B64 = B64Stream.str() + padding;
+    } else {
+      B64 = B64Stream.str();
+    }
+    return B64;
   }
+
+  /*std::string Hex2B64(std::string s){
+
+  }*/
+
 }
+
 int main() {
   std::string s;
 	std::cout << "Provide a string:" << std::endl;
 	std::cin >> s;
-  /*std::vector<bool> Bin = Crypto::Str2Bin(s);
-  for (bool i: Bin) std::cout << i;
-  std::cout << std::endl;
-  std::string Hex = Crypto::Str2Hex(s);
-  std::cout << Hex << std::endl;*/
   std::string B64 = Crypto::Str2B64(s);
   std::cout << B64 << std::endl;
   return 0;
