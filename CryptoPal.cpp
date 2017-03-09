@@ -4,7 +4,7 @@
 #include <vector>
 #include <bitset>
 
-namespace Crypto{
+namespace Encrypt{
 
 	// Declaration of the Base64 and alphabet
   const std::string B64pad = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -75,9 +75,9 @@ namespace Crypto{
 
 int main() {
   std::string s;
-	std::cout << "Provide a string:" << std::endl;
-	std::cin >> s;
-  std::string B64 = Crypto::Str2B64(s);
+  std::cout << "Provide a string:" << std::endl;
+  std::cin >> s;
+  std::string B64 = Encrypt::Str2B64(s);
   std::cout << B64 << std::endl;
   return 0;
 }
