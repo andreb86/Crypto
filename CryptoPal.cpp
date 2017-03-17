@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <bitset>
+#include <stdexcept>
 
 namespace Encrypt{
 
@@ -67,16 +68,27 @@ namespace Encrypt{
     return B64;
   }
 
-  /*std::string Hex2B64(std::string s){
+  std::string Hex2B64(std::string s){
+    try {
+      // check if input string length is valid
+      if (s.length() % 2){ throw std::invalid_argument('Incomplete hex byte');}
 
-  }*/
+      // Convert hexadecimal string to Base64
+      for (std::string::const_iterator it = s.cbegin(); it < s.cend(); ++it){
+        
+      }
+
+    } catch (const std::invalid_argument& IA) {
+      std::cerr << 'Invalid Argument: ' << IA.what() << std::endl;
+    }
+  }
 
 }
 
 int main() {
   std::string s;
-  std::cout << "Provide a string:" << std::endl;
-  std::cin >> s;
+	std::cout << "Provide a string:" << std::endl;
+	std::cin >> s;
   std::string B64 = Encrypt::Str2B64(s);
   std::cout << B64 << std::endl;
   return 0;
